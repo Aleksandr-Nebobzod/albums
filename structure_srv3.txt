@@ -1,0 +1,6 @@
+./app/build.gradle.kts
+./app/src/androidTest/java/top/smartable/albums/ExampleInstrumentedTest.kt
+./app/src/test/java/top/smartable/albums/ExampleUnitTest.kt
+./build.gradle.kts
+./gradle/libs.versions.toml
+./settings.gradle.kts
