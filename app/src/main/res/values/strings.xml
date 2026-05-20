@@ -1,3 +1,13 @@
 <resources>
-	<string name="app_name">albums</string>
+	<string name="app_name">Альбомник</string>
+	<string name="status_ok">Соединение есть</string>
+	<string name="status_waiting">Сервис ожидает</string>
+	<string name="log_title">Лог событий:</string>
+	<string name="button_settings">Настройки</string>
+	<string name="button_send">Отправить фото</string>
+	<string name="log_service_started">Сервис запущен</string>
+	<string name="log_waiting_photos">Ожидание фото</string>
+	<string name="log_connection_checked">Соединение проверено</string>
+	<string name="log_no_events">Нет событий</string>
+	<string name="button_receive">Получить</string>
 </resources>

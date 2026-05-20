@@ -55,4 +55,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.okhttp)
 }

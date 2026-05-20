@@ -1,6 +1,5 @@
 package top.smartable.albums
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,12 +9,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
+import androidx.lifecycle.viewmodel.compose.viewModel
+import top.smartable.albums.ui.viewmodels.MainViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
 
         setContent {
             MaterialTheme {
@@ -27,21 +31,17 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
-    var statusText by remember { mutableStateOf("Проверка соединения...") }
-    var logs by remember { mutableStateOf(listOf("Сервис запущен", "Ожидание фото")) }
-
-    // Имитация проверки соединения
-    LaunchedEffect(Unit) {
-        delay(1000)
-        statusText = "Соединение есть"
-        logs = listOf("Соединение проверено") + logs
-    }
+fun MainScreen(
+    viewModel: MainViewModel = viewModel()
+) {
+    val context = LocalContext.current
+    val statusText by viewModel.statusText.collectAsState()
+    val logs by viewModel.logs.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Album Courier") }
+                title = { Text(stringResource(R.string.app_name)) }
             )
         }
     ) { paddingValues ->
@@ -52,6 +52,7 @@ fun MainScreen() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+            // Верхняя часть: статус и лог
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -69,7 +70,10 @@ fun MainScreen() {
                 }
 
                 // Заголовок лога
-                Text("Лог событий:", style = MaterialTheme.typography.titleSmall)
+                Text(
+                    text = stringResource(R.string.log_title),
+                    style = MaterialTheme.typography.titleSmall
+                )
 
                 // Список логов
                 LazyColumn(
@@ -78,35 +82,44 @@ fun MainScreen() {
                         .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    items(logs) { log ->
-                        Text(
-                            text = log,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                        )
-                        Divider()
+                    if (logs.isEmpty()) {
+                        item {
+                            Text(
+                                text = stringResource(R.string.log_no_events),
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                    } else {
+                        items(logs) { log ->
+                            Text(
+                                text = log,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                            )
+                            Divider()
+                        }
                     }
                 }
             }
 
-            // Кнопки
+            // Кнопки внизу
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
-                    onClick = { /* TODO: настройки */ },
+                    onClick = { viewModel.refreshStatus() },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Настройки")
+                    Text(stringResource(R.string.button_settings))
                 }
                 Button(
-                    onClick = { /* TODO: отправка */ },
+                    onClick = { viewModel.receivePhotos(context) },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Отправить фото")
+                    Text(stringResource(R.string.button_receive))
                 }
             }
         }
