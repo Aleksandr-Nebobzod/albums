@@ -1,5 +1,6 @@
 package top.smartable.albums
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -120,6 +121,15 @@ fun MainScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(stringResource(R.string.button_receive))
+                }
+                Button(
+                    onClick = {
+                        val intent = Intent(context, SenderActivity::class.java)
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.button_send))
                 }
             }
         }
