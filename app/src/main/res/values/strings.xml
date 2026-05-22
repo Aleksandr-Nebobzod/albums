@@ -9,5 +9,6 @@
 	<string name="log_waiting_photos">Ожидание фото</string>
 	<string name="log_connection_checked">Соединение проверено</string>
 	<string name="log_no_events">Нет событий</string>
-	<string name="button_receive">Получить</string>
+	<string name="button_cloud_it">Склаудировать</string>
+	<string name="settings_title">НасТроечки</string>
 </resources>

@@ -87,7 +87,7 @@ app/src/main/java/top/smartable/albums/
 - ✅ Проект собран, Compose UI работает
 - ✅ `strings.xml` — строки вынесены
 - ✅ `PhotoGatewayApi.ping()` — соединение проверяется, статус отображается
-- ✅ `PhotoBridge.syncFromGateway()` — скачивает фото с сервера, сохраняет в `Pictures/AlbumCourier/`, удаляет из очереди
+- ✅ `PhotoBridge.syncFromGateway()` — скачивает фото с сервера, сохраняет в `Pictures/Pixel3archive/`, удаляет из очереди
 - ✅ Кнопка «Получить фото» запускает синхронизацию, логи пишутся в UI
 
 **Встреченные ошибки и решения:**

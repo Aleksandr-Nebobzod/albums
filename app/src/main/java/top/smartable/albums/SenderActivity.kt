@@ -1,6 +1,7 @@
 package top.smartable.albums
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -26,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import top.smartable.albums.data.PhotoGatewayApi
 import kotlinx.coroutines.launch
 import androidx.lifecycle.lifecycleScope
+import top.smartable.albums.data.SettingsManager
 
 class SenderActivity : ComponentActivity() {
 
@@ -42,6 +44,10 @@ class SenderActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate")
+        Log.d(TAG, "onCreate, intent action = ${intent?.action}")
+        Log.d(TAG, "intent extras = ${intent?.extras?.keySet()}")
+
+        handleIncomingIntent(intent)
 
         setContent {
             MaterialTheme {
@@ -61,6 +67,42 @@ class SenderActivity : ComponentActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        Log.d(TAG, "Получен интент")
+        super.onNewIntent(intent)
+        intent?.let { handleIncomingIntent(it) }
+    }
+
+    private fun handleIncomingIntent(intent: Intent) {
+        Log.d(TAG, "=== handleIncomingIntent ===")
+        Log.d(TAG, "action = ${intent.action}")
+        Log.d(TAG, "type = ${intent.type}")
+        Log.d(TAG, "extras keys = ${intent.extras?.keySet()}")
+        when (intent.action) {
+            Intent.ACTION_SEND_MULTIPLE -> {
+                Log.d(TAG, "Обработка интента")
+                intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)?.let { uris ->
+                    selectedPhotos.value = uris
+    //                    addLog("Получено ${uris.size} фото из Share")
+                    Log.d(TAG, "Получено ${uris.size} фото из Share")
+                    Toast.makeText(this@SenderActivity, "Получено ${uris.size} фото из Share", Toast.LENGTH_SHORT).show()
+                }
+            }
+            Intent.ACTION_SEND -> {
+                (intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)?.let { listOf(it) })?.let { uris ->
+                    selectedPhotos.value = uris
+    //                    addLog("Получено фото из Share")
+                    Log.d(TAG, "Получено фото из Share")
+                    Toast.makeText(this@SenderActivity, "Получено фото из Share", Toast.LENGTH_SHORT).show()
+                }
+            }
+            else -> {
+                Log.d(TAG, "Запуск обычным способом — без входных фото")
+                // Можно ничего не делать, либо показать подсказку.
+            }
+        }
+    }
+
 
     private fun sendPhotos(uris: List<Uri>) {
         lifecycleScope.launch {
@@ -68,19 +110,19 @@ class SenderActivity : ComponentActivity() {
                 try {
                     val bytes = contentResolver.openInputStream(uri)?.readBytes()
                     if (bytes != null) {
-                        val fileName = System.currentTimeMillis().toString() + ".jpg"
+                        var fileName = System.currentTimeMillis().toString() + ".jpg"
                         val success = PhotoGatewayApi.uploadPhoto(
-                            PhotoGatewayApi.DEFAULT_SERVER_URL,
+                            SettingsManager.getServerUrl(this@SenderActivity),
                             bytes,
                             fileName
                         )
                         if (success) {
-                            Log.d(TAG, "Отправлено: $fileName")
-                            Toast.makeText(this@SenderActivity, "Отправлено: $fileName", Toast.LENGTH_SHORT).show()
+                            fileName+=" -- собран"
                         } else {
-                            Log.d(TAG, "Ошибка: $fileName")
-                            Toast.makeText(this@SenderActivity, "Ошибка: $fileName", Toast.LENGTH_SHORT).show()
+                            fileName+=" -- ПРОМАХ :("
                         }
+                        Toast.makeText(this@SenderActivity, fileName, Toast.LENGTH_SHORT).show()
+                        SettingsManager.addLog(this@SenderActivity, fileName)
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Ошибка: ${e.message}")
@@ -109,6 +151,11 @@ fun SenderScreen(
                 title = { Text(stringResource(R.string.app_name)) },
                 navigationIcon = {
                     IconButton(onClick = onBackPressed) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Назад",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer  // или просто Color.Black
+                        )
                         Log.d("SenderScreen", "Клик по иконке назад")
                     }
                 }

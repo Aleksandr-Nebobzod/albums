@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "top.smartable.albums"
+        applicationId = "com.gmail.nebobrod.pixel3a"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

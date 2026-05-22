@@ -14,19 +14,32 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.lifecycle.ViewModelProvider
+import top.smartable.albums.data.SettingsManager
+import top.smartable.albums.ui.SettingsActivity
 import top.smartable.albums.ui.viewmodels.MainViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var viewModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         setContent {
             MaterialTheme {
                 MainScreen()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.refreshLogs(this)
     }
 }
 
@@ -38,12 +51,26 @@ fun MainScreen(
     val context = LocalContext.current
     val statusText by viewModel.statusText.collectAsState()
     val logs by viewModel.logs.collectAsState()
+    val isServerEnabled = SettingsManager.isServerEnabled(context)
+
+    viewModel.checkConnection(LocalContext.current)
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) }
+                title = { Text(stringResource(R.string.app_name)) },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            val intent = Intent(context, SettingsActivity::class.java)
+                            context.startActivity(intent)
+                        }
+                    ) {
+                        Icon(Icons.Default.Settings, contentDescription = "Настройки")
+                    }
+                }
             )
+
         }
     ) { paddingValues ->
         Column(
@@ -110,17 +137,13 @@ fun MainScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Button(
-                    onClick = { viewModel.refreshStatus() },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(stringResource(R.string.button_settings))
-                }
-                Button(
-                    onClick = { viewModel.receivePhotos(context) },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(stringResource(R.string.button_receive))
+                if (isServerEnabled) {  // ← кнопка активна только в режиме сервера
+                    Button(
+                        onClick = { viewModel.cloudIt(context) },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.button_cloud_it))
+                    }
                 }
                 Button(
                     onClick = {
