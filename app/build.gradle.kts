@@ -57,4 +57,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.okhttp)
+    implementation(libs.androidx.work)
+    implementation (libs.bcastle)
+    implementation (libs.cmqtt)
+    implementation (libs.pahos)
 }

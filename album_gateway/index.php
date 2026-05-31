@@ -38,19 +38,37 @@ if ($action === 'upload' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// ========== 2. ПОЛУЧИТЬ СПИСОК ФОТО (получатель) ==========
-elseif ($action === 'list') {
-    $files = glob($storage_dir . '*.jpg');
-    $result = array();
-    
+// ========== 2.0 ПОЛУЧИТЬ Число ФОТО (получатель) ==========
+elseif ($action === 'count') {
+    $files = glob($storage_dir . '*.*');
+    $count = 0;
     foreach ($files as $file) {
-        $result[] = array(
-            'id' => basename($file),
-            'size' => filesize($file),
-            'time' => filemtime($file)
-        );
+        if (strpos(mime_content_type($file), 'image/') === 0) {
+            $count++;
+        }
     }
-    
+    header('Content-Type: application/json');
+    echo json_encode(['count' => $count]);
+}
+
+// ========== 2.1 ПОЛУЧИТЬ СПИСОК ФОТО (получатель) ==========
+elseif ($action === 'list') {
+    $allFiles = scandir($storage_dir);
+    $result = array();
+
+    foreach ($allFiles as $file) {
+        if ($file === '.' || $file === '..') continue;
+        $filePath = $storage_dir . $file;
+        $mime = mime_content_type($filePath);
+        if (strpos($mime, 'image/') === 0) {
+            $result[] = array(
+                'id' => $file,
+                'size' => filesize($filePath),
+                'time' => filemtime($filePath)
+            );
+        }
+    }
+
     // Сортируем от старых к новым (без стрелочной функции)
     usort($result, 'compare_by_time');
     

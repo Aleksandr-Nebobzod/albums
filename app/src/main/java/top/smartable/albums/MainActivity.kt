@@ -152,7 +152,7 @@ fun MainScreen(
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text(stringResource(R.string.button_send))
+                    Text(stringResource(R.string.button_collect))
                 }
             }
         }

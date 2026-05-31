@@ -7,6 +7,7 @@ import okhttp3.Request
 import org.json.JSONArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 object PhotoGate {
@@ -118,7 +119,7 @@ object PhotoGate {
                 onLog("Скачано: $id (${photoBytes.size} байт)")
 
                 // Удалить с сервера
-                val deleteUrl = if (serverUrl.contains("?")) "$serverUrl&action=delete&id=$id" else "$serverUrl?action=delete&id=$id"
+                val deleteUrl = "$serverUrl?action=delete&id=$id"
                 val deleteRequest = Request.Builder()
                     .url(deleteUrl)
                     .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
@@ -141,6 +142,42 @@ object PhotoGate {
         }
     }
 
-    suspend fun getQueueCount(serverUrl: String, context: Context): Int {return 0}
-    suspend fun clearGateway(serverUrl: String, context: Context): Boolean {return true}
+
+    /**
+     * Число файлов на гейте
+     */
+    suspend fun getQueueCount(serverUrl: String): Int {
+        return withContext(Dispatchers.IO) {
+            try {
+                val countUrl = "$serverUrl?action=count"
+                val request = Request.Builder()
+                    .url(countUrl)
+                    .header(
+                        "User-Agent",
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                    )
+                    .get()
+                    .build()
+                val response = client.newCall(request).execute()
+                val body = response.body?.string() ?: "{}"
+
+                if (!response.isSuccessful) {
+                    Log.e(TAG, "HTTP error: ${response.code}, body: $body")
+                    return@withContext 0
+                }
+
+                // Парсим объект, а не массив
+                val jsonObject = JSONObject(body)
+                jsonObject.optInt("count", 0)
+            } catch (e: Exception) {
+                Log.e(TAG, "getQueueCount error: ${e.message}")
+                0
+            }
+        }
+    }
+
+    fun clearGateway(serverUrl: String): Boolean {
+        return false
+
+    }
 }

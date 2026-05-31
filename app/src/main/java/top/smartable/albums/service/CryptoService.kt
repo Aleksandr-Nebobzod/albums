@@ -1,4 +1,4 @@
-package top.smartable.albums.data
+package top.smartable.albums.service
 
 import android.util.Log
 import java.io.*
@@ -62,17 +62,20 @@ class CryptoService(private val port: Int = 8888) : Thread() {
             val keyBytes = ByteArray(keyLength)
             dataInputStream.readFully(keyBytes)
             val key = SecretKeySpec(keyBytes, "AES")
+            Log.d("CryptoService", "KEY: ${keyBytes.joinToString("") { "%02x".format(it) }}")
 
             // Читаем IV (nonce) — 12 байт для GCM
             val ivLength = dataInputStream.readInt()
             val iv = ByteArray(ivLength)
             dataInputStream.readFully(iv)
             val gcmSpec = GCMParameterSpec(GCM_TAG_LENGTH, iv)
+            Log.d("CryptoService", "IV: ${iv.joinToString("") { "%02x".format(it) }}")
 
             // Читаем длину данных (шифруемых или дешифруемых)
             val dataLength = dataInputStream.readInt()
             val data = ByteArray(dataLength)
             dataInputStream.readFully(data)
+            Log.d("CryptoService", "DATA: ${data.joinToString("") { "%02x".format(it) }}")
 
             // Читаем AAD (Additional Authenticated Data) — опционально
             val aadLength = dataInputStream.readInt()

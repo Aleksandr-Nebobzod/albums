@@ -201,7 +201,7 @@ fun SettingsScreen() {
             Button(
                 onClick = {
                     (context as? ComponentActivity)?.lifecycleScope?.launch {
-                        val count = PhotoGate.getQueueCount(SettingsManager.getServerUrl(context), context)
+                        val count = PhotoGate.getQueueCount(SettingsManager.getServerUrl(context))
                         val msg = "Файлов на гейте: $count"
                         SettingsManager.addLog(context, msg)
                         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
@@ -214,7 +214,7 @@ fun SettingsScreen() {
             Button(
                 onClick = {
                     (context as? ComponentActivity)?.lifecycleScope?.launch {
-                        val success = PhotoGate.clearGateway(SettingsManager.getServerUrl(context), context)
+                        val success = PhotoGate.clearGateway(SettingsManager.getServerUrl(context))
                         val msg = if (success) "Гейт очищен" else "Ошибка очистки гейта"
                         SettingsManager.addLog(context, msg)
                         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
