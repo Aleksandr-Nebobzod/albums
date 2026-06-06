@@ -264,3 +264,6 @@ app/src/main/java/top/smartable/albums/
 ---
 
 #2026-05-30
+https://github.com/CiscoCXSecurity/sslxray/blob/master/tlslite/utils/aesgcm.py
+-- вариант библиотеки криптографической библиотеки без Rust
+
