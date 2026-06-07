@@ -4,7 +4,7 @@
 	<string name="status_waiting">Сервис ожидает</string>
 	<string name="log_title">Лог событий:</string>
 	<string name="button_settings">Настройки</string>
-	<string name="button_collect">4 микрона</string>
+	<string name="button_collect">4 микрона...</string>
 	<string name="log_service_started">Сервис запущен</string>
 	<string name="log_waiting_photos">Ожидание фото</string>
 	<string name="log_connection_checked">Соединение проверено</string>

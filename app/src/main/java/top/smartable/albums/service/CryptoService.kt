@@ -15,6 +15,24 @@ class CryptoService(private val port: Int = 8888) : Thread() {
     private var isRunning = false
 
     companion object {
+        fun encrypt(key: ByteArray, nonce: ByteArray, plaintext: ByteArray, aad: ByteArray?): ByteArray {
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            val secretKey = SecretKeySpec(key, "AES")
+            val gcmSpec = GCMParameterSpec(128, nonce)
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmSpec)
+            if (aad != null) cipher.updateAAD(aad)
+            return cipher.doFinal(plaintext)
+        }
+
+        fun decrypt(key: ByteArray, nonce: ByteArray, ciphertext: ByteArray, aad: ByteArray?): ByteArray {
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            val secretKey = SecretKeySpec(key, "AES")
+            val gcmSpec = GCMParameterSpec(128, nonce)
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec)
+            if (aad != null) cipher.updateAAD(aad)
+            return cipher.doFinal(ciphertext)
+        }
+
         private const val TAG = "CryptoService"
         private const val GCM_TAG_LENGTH = 128 // бит
         private const val GCM_IV_LENGTH = 12    // байт

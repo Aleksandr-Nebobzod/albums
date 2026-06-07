@@ -3,6 +3,7 @@ package top.smartable.albums
 import android.app.Application
 import android.util.Log
 import androidx.work.*
+import top.smartable.albums.data.SettingsManager
 import top.smartable.albums.service.CryptoService
 import top.smartable.albums.service.SyncWorker
 import top.smartable.albums.service.TuyaMqttBridge
@@ -12,6 +13,8 @@ class App : Application() {
     private lateinit var cryptoService: CryptoService
     private lateinit var mqttBridge: TuyaMqttBridge
 
+
+
     override fun onCreate() {
         super.onCreate()
         scheduleSync()
@@ -19,8 +22,9 @@ class App : Application() {
         // это для cтарого процессора ноутбука
         cryptoService = CryptoService(8888)
         cryptoService.start()
-        mqttBridge = TuyaMqttBridge(this)
-        mqttBridge.start()
+        if (SettingsManager.isMqttBridgeEnabled(this)) {
+            startTuyaBridge()
+        }
     }
 
 
@@ -40,5 +44,28 @@ class App : Application() {
             ExistingPeriodicWorkPolicy.KEEP,
             syncRequest
         )
+    }
+
+    fun startTuyaBridge() {
+        if (!::mqttBridge.isInitialized) {
+            mqttBridge = TuyaMqttBridge(this)
+            Log.i("App", "mqttBridge initialized")
+        }
+        mqttBridge.start()
+        Log.i("App", "mqttBridge started")
+    }
+
+    fun stopTuyaBridge() {
+        if (::mqttBridge.isInitialized) {
+            mqttBridge.stop()
+        }
+    }
+
+    fun testHandshake() {
+        if (::mqttBridge.isInitialized) {
+            mqttBridge.testHandshake()
+        } else {
+            Log.e("App", "Bridge not initialized")
+        }
     }
 }

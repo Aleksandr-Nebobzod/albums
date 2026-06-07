@@ -267,3 +267,23 @@ app/src/main/java/top/smartable/albums/
 https://github.com/CiscoCXSecurity/sslxray/blob/master/tlslite/utils/aesgcm.py
 -- вариант библиотеки криптографической библиотеки без Rust
 
+#2026-06-07
+sudo airmon-ng start wlp3s0
+
+Found 4 processes that could cause trouble.
+Kill them using 'airmon-ng check kill' before putting
+the card in monitor mode, they will interfere by changing channels
+and sometimes putting the interface back in managed mode
+
+    PID Name
+    811 avahi-daemon
+    856 avahi-daemon
+    906 NetworkManager
+    915 wpa_supplicant
+
+PHY     Interface       Driver          Chipset
+
+phy0    wlp3s0          ath10k_pci      Qualcomm Atheros QCA9377 802.11ac Wireless Network Adapter (rev 31)
+                (mac80211 monitor mode vif enabled for [phy0]wlp3s0 on [phy0]wlp3s0mon)
+                (mac80211 station mode vif disabled for [phy0]wlp3s0)
+

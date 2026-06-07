@@ -59,6 +59,7 @@ fun SettingsScreen() {
     var showDialog by remember { mutableStateOf(false) }
     var bridgeFolderName by remember { mutableStateOf(SettingsManager.getBridgeFolderName(context)) }
     var tempFolderName by remember { mutableStateOf(bridgeFolderName) }
+    var mqttBridgeEnabled by remember { mutableStateOf(SettingsManager.isMqttBridgeEnabled(context)) }
 
     Scaffold(
         topBar = {
@@ -246,6 +247,38 @@ fun SettingsScreen() {
                 Text("Очистить мост")
             }
 
+            HorizontalDivider()
+
+// Переключатель включения TuyaMqttBridge
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("MQTT Bridge (Tuya)", style = MaterialTheme.typography.bodyLarge)
+                Switch(
+                    checked = mqttBridgeEnabled,
+                    onCheckedChange = { isEnabled ->
+                        mqttBridgeEnabled = isEnabled
+                        SettingsManager.setMqttBridgeEnabled(context, isEnabled)
+                        val app = (context.applicationContext as? top.smartable.albums.App)
+                        if (isEnabled) {
+                            app?.startTuyaBridge()
+                        } else {
+                            app?.stopTuyaBridge()
+                        }
+                    }
+                )
+            }
+
+            Button(
+                onClick = {
+                    val app = context.applicationContext as? top.smartable.albums.App
+                    app?.testHandshake()
+                }
+            ) {
+                Text("Тест handshake")
+            }
             HorizontalDivider()
 
             // Кнопка очистки лога

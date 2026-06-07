@@ -40,6 +40,13 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    packaging {
+        resources {
+            // Исключаем дублирующиеся INDEX.LIST и другие служебные файлы Netty
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/io.netty.versions.properties"
+        }
+    }
 }
 
 dependencies {
@@ -59,6 +66,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.androidx.work)
     implementation (libs.bcastle)
-    implementation (libs.cmqtt)
-    implementation (libs.pahos)
+    //implementation (libs.cmqtt)
+    //implementation (libs.pahos)
+    //implementation(libs.paho.mqtt.android)
+    implementation(libs.hivemq.mqtt.client)
 }

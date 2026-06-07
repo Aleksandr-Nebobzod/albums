@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.core.content.edit
 
 object SettingsManager {
     private const val PREFS_NAME = "album_courier_prefs"
@@ -13,6 +14,8 @@ object SettingsManager {
     private const val MAX_LOG_SIZE = 100
     private const val KEY_BRIDGE_FOLDER = "bridge_folder"
     private const val DEFAULT_BRIDGE_FOLDER = "Pixel3archive"
+
+    private const val KEY_MQTT_BRIDGE_ENABLED = "bridge_enabled"
 
 
     private const val DEFAULT_SERVER_URL = "http://attplus.in/album_gateway/index.php"
@@ -26,7 +29,7 @@ object SettingsManager {
     }
 
     fun setServerEnabled(context: Context, enabled: Boolean) {
-        getPrefs(context).edit().putBoolean(KEY_SERVER_ENABLED, enabled).apply()
+        getPrefs(context).edit { putBoolean(KEY_SERVER_ENABLED, enabled) }
     }
 
     fun getServerUrl(context: Context): String {
@@ -34,7 +37,7 @@ object SettingsManager {
     }
 
     fun setServerUrl(context: Context, url: String) {
-        getPrefs(context).edit().putString(KEY_SERVER_URL, url).apply()
+        getPrefs(context).edit { putString(KEY_SERVER_URL, url) }
     }
 
     fun addLog(context: Context, message: String) {
@@ -47,7 +50,7 @@ object SettingsManager {
             currentLogs.removeAt(currentLogs.size - 1)
         }
 
-        getPrefs(context).edit().putString(KEY_EVENT_LOG, currentLogs.joinToString("\n")).apply()
+        getPrefs(context).edit { putString(KEY_EVENT_LOG, currentLogs.joinToString("\n")) }
     }
 
     fun getLogs(context: Context): List<String> {
@@ -56,10 +59,18 @@ object SettingsManager {
     }
 
     fun clearLogs(context: Context) {
-        getPrefs(context).edit().remove(KEY_EVENT_LOG).apply()
+        getPrefs(context).edit { remove(KEY_EVENT_LOG) }
     }
 
     fun getBridgeFolderName(context: Context): String { return "" }
     fun setBridgeFolderName(context: Context, name: String) {  }
+
+    fun isMqttBridgeEnabled(context: Context): Boolean {
+        return getPrefs(context).getBoolean(KEY_MQTT_BRIDGE_ENABLED, false)
+    }
+
+    fun setMqttBridgeEnabled(context: Context, enabled: Boolean) {
+        getPrefs(context).edit { putBoolean(KEY_MQTT_BRIDGE_ENABLED, enabled) }
+    }
 
 }
