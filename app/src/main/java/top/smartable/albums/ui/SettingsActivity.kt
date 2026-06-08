@@ -29,6 +29,8 @@ import top.smartable.albums.data.SettingsManager
 import top.smartable.albums.data.PhotoGate
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import java.io.File
@@ -225,12 +227,14 @@ fun SettingsScreen() {
             ) {
                 Text("Очистить гейт")
             }
+
             // Локальный сервер передачи фоток в облако
             Button(
                 onClick = {
-                    val countOfGateQueue = "Файлов на мосту: " + 999
-                    SettingsManager.addLog(context, countOfGateQueue)
-                    Toast.makeText(context, countOfGateQueue, Toast.LENGTH_SHORT).show()
+                    val count = getBridgeFileCount(context)
+                    val msg = "Файлов на мосту: $count"
+                    SettingsManager.addLog(context, msg)
+                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -243,6 +247,7 @@ fun SettingsScreen() {
                     Toast.makeText(context, "Мост очищен", Toast.LENGTH_SHORT).show()
                 },
                 modifier = Modifier.fillMaxWidth(),
+                enabled = serverEnabled  // ← только когда режим сервера включён
             ) {
                 Text("Очистить мост")
             }
@@ -267,7 +272,8 @@ fun SettingsScreen() {
                         } else {
                             app?.stopTuyaBridge()
                         }
-                    }
+                    },
+                    enabled = false
                 )
             }
 
@@ -275,7 +281,8 @@ fun SettingsScreen() {
                 onClick = {
                     val app = context.applicationContext as? top.smartable.albums.App
                     app?.testHandshake()
-                }
+                },
+                enabled = false
             ) {
                 Text("Тест handshake")
             }
@@ -297,16 +304,37 @@ fun SettingsScreen() {
     }
 }
 
+private fun getBridgeFileCount(context: Context): Int {
+    val folderName = SettingsManager.getBridgeFolderName(context)
+    val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+    val folder = File(picturesDir, folderName)
+
+    Log.d("BridgeCount", "Путь к папке: ${folder.absolutePath}")
+    Log.d("BridgeCount", "Существует: ${folder.exists()}")
+    Log.d("BridgeCount", "Файлов в папке по File API: ${folder.listFiles()?.size ?: 0}")
+    if (folder.exists()) {
+        folder.listFiles()?.forEach { file ->
+            Log.d("BridgeCount", "Файл/папка: ${file.name}, isDir=${file.isDirectory}")
+        }
+    }
+
+    if (!folder.exists()) return 0
+    return folder.listFiles()?.filter { it.isFile }?.size ?: 0
+}
 private fun clearBridge(context: Context) {
     val folderName = SettingsManager.getBridgeFolderName(context)
-    val folder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        // Для Android 10+ используем MediaStore
-        // Пока заглушка — удаляем через File API (требует MANAGE_EXTERNAL_STORAGE)
-        Toast.makeText(context, "Очистка моста требует дополнительных разрешений", Toast.LENGTH_LONG).show()
-        return
-    } else {
-        val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        File(picturesDir, folderName)
-    }
-    folder.listFiles()?.forEach { it.delete() }
+    val relativePath = "${Environment.DIRECTORY_PICTURES}/$folderName"
+
+    val selection = "${MediaStore.Images.Media.RELATIVE_PATH} = ?"
+    val selectionArgs = arrayOf(relativePath)
+
+    val deleted = context.contentResolver.delete(
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        selection,
+        selectionArgs
+    )
+
+    val message = if (deleted > 0) "Удалено файлов: $deleted" else "Папка пуста или не существует"
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    SettingsManager.addLog(context, "Очистка моста: $message")
 }

@@ -62,8 +62,12 @@ object SettingsManager {
         getPrefs(context).edit { remove(KEY_EVENT_LOG) }
     }
 
-    fun getBridgeFolderName(context: Context): String { return "" }
-    fun setBridgeFolderName(context: Context, name: String) {  }
+    fun getBridgeFolderName(context: Context): String {
+        return getPrefs(context).getString(KEY_BRIDGE_FOLDER, DEFAULT_BRIDGE_FOLDER) ?: DEFAULT_BRIDGE_FOLDER
+    }
+    fun setBridgeFolderName(context: Context, name: String) {
+        getPrefs(context).edit { putString(KEY_BRIDGE_FOLDER, name) }
+    }
 
     fun isMqttBridgeEnabled(context: Context): Boolean {
         return getPrefs(context).getBoolean(KEY_MQTT_BRIDGE_ENABLED, false)

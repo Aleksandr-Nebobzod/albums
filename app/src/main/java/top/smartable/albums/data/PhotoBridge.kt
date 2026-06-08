@@ -11,13 +11,14 @@ import java.io.FileOutputStream
 object PhotoBridge {
 
     fun savePhoto(context: Context, bytes: ByteArray, fileName: String): Boolean {
+        val folderName = SettingsManager.getBridgeFolderName(context)
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val resolver = context.contentResolver
                 val contentValues = ContentValues().apply {
                     put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
                     put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/Pixel3archive")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/$folderName")
                 }
                 val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
                 uri?.let {
@@ -28,7 +29,7 @@ object PhotoBridge {
                 } ?: false
             } else {
                 val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                val backupDir = File(picturesDir, "Pixel3archive")
+                val backupDir = File(picturesDir, folderName)
                 if (!backupDir.exists()) backupDir.mkdirs()
                 val photoFile = File(backupDir, fileName)
                 FileOutputStream(photoFile).use { it.write(bytes) }

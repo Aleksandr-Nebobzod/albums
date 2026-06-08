@@ -14,7 +14,7 @@
 | Проверка связи | `GET ?action=ping` → `{"status":"ok"}` |
 
 ## Адрес
-`https://attplus.in/album_gateway/index.php`
+`http://attplus.in/album_gateway/index.php`
 
 ## Тестирование
 - ✅ `ping` возвращает JSON

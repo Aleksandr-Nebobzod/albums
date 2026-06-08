@@ -16,22 +16,41 @@ if ($action === 'upload' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         http_response_code(400);
         die('No photo uploaded');
     }
-    
+
     $file = $_FILES['photo'];
-    
-    // Проверка размера (20MB)
+
     if ($file['size'] > 20 * 1024 * 1024) {
         http_response_code(413);
         die('File too large');
     }
-    
-    // Уникальное имя
-    $id = uniqid() . '_' . time() . '.jpg';
-    $destination = $storage_dir . $id;
-    
-    if (move_uploaded_file($file['tmp_name'], $destination)) {
+
+    $originalName = basename($file['name']);
+
+    // Реестр обработанных файлов
+    $registry_file = $storage_dir . '.registry.json';
+    $registry = [];
+    if (file_exists($registry_file)) {
+        $registry = json_decode(file_get_contents($registry_file), true);
+        if (!is_array($registry)) $registry = [];
+    }
+
+    // Проверка по оригинальному имени
+    if (isset($registry[$originalName])) {
         header('Content-Type: application/json');
-        echo json_encode(array('status' => 'ok', 'id' => $id));
+        echo json_encode(['status' => 'duplicate', 'id' => $originalName]);
+        return;
+    }
+
+    // Сохраняем с оригинальным именем
+    $destination = $storage_dir . $originalName;
+
+    if (move_uploaded_file($file['tmp_name'], $destination)) {
+        // Регистрируем имя (не удаляется даже после очистки очереди)
+        $registry[$originalName] = time();
+        file_put_contents($registry_file, json_encode($registry));
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'ok', 'id' => $originalName]);
     } else {
         http_response_code(500);
         die('Save failed');
