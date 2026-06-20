@@ -258,3 +258,16 @@ _я подумаю... Ну и напоследок:_
 - **Роль:** Обычный Zigbee-координатор (как USB-стик).
 - **Протокол:** Говорит на чистом Zigbee (EZSP).
 - **Зависимости:** Не требует ничего. Подключается напрямую к любому Zigbee-софту (Domoticz, Zigbee2MQTT, Home Assistant) через USB.
+
+# Дополнительное интересное
+
+https://zigbee-alliance.github.io/distributed-compliance-ledger/
+-- тут на всю их структуру API вместе с вендорами, PKI и номерами моделей и софта (комментариев, правда, маловато)
+
+https://github.com/zigbee-alliance/distributed-compliance-ledger
+-- DCL is a public permissioned ledger framework for certification of device models. The ledger is based on Cosmos SDK and CometBFT (Tendermint). 
+
+https://community.home-assistant.io/t/do-matter-owners-mind-the-integrated-kill-switch/942167
+-- вишенка на торте, покупатели устройств именуются "владельцами" в кавычках;
+**Это механизм отзыва сертификатов (Certificate Revocation). Если устройство Matter скомпрометировано, перестало соответствовать стандарту или его сертификат истек, то информация об этом попадает в глобальный реестр DCL (Distributed Compliance Ledger).
+Когда вы пытаетесь подключить или обновить устройство, ваш хаб (комиссионер) проверяет его статус в DCL. Если сертификат отозван, хаб может либо предупредить вас, либо заблокировать устройство, либо перевести его в "ограниченный режим работы".**
