@@ -203,14 +203,14 @@ fun SenderScreen(
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Вынь")
+                    Text("Вынь..")
                 }
                 Button(
                     onClick = { onSendPhotos(selectedPhotos) },
                     modifier = Modifier.weight(1f),
                     enabled = selectedPhotos.isNotEmpty()
                 ) {
-                    Text("Да положь (${selectedPhotos.size})")
+                    Text("..даПоложь! (${selectedPhotos.size})")
                 }
             }
         }

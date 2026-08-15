@@ -11,8 +11,8 @@ android {
         applicationId = "com.gmail.nebobrod.pixel3a"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 130
+        versionName = "1.30"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
